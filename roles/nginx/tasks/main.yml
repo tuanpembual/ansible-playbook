@@ -1,0 +1,22 @@
+---
+- name: Check Environment
+  debug: msg="reading from {{ env_name }}"
+
+- name: Update repositories cache and install "nginx" package
+  apt:
+    name: nginx
+    update_cache: yes
+  become: true
+
+- name: salin index.html
+  copy:
+    src: files/index.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: 0755
+  become: true
+  notify:
+    - restart nginx
+
+- name: install cerbot
