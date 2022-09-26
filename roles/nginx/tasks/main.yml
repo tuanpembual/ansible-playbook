@@ -18,5 +18,3 @@
   become: true
   notify:
     - restart nginx
-
-- name: install cerbot

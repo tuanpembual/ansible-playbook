@@ -2,5 +2,5 @@
 
 ## Running
 ```
-ansible-playbook -i hosts nginx.yml
+ansible-playbook -i hosts server.yml
 ```
