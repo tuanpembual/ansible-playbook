@@ -1,5 +1,6 @@
 ---
 - name: Install nginx with ansible
-  hosts: nginx
+  hosts: ansible-final
   roles:
      - nginx
+     - jenkins

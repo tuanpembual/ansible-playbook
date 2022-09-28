@@ -6,15 +6,61 @@
   apt:
     name: nginx
     update_cache: yes
+    autoremove: yes
   become: true
 
-- name: salin index.html
+- name: Delete default config
+  file:
+    state: absent
+    path: /etc/nginx/sites-enabled/default
+  become: true
+
+- name: Setup domain jenkins
   copy:
-    src: files/index.html
-    dest: /var/www/html/index.html
+    src: files/jenkins-estu.cilsy.my.id
+    dest: /etc/nginx/sites-available/jenkins-estu.cilsy.my.id
     owner: root
     group: root
     mode: 0755
   become: true
+
+- name: Enable Site Config
+  file:
+    src: /etc/nginx/sites-available/jenkins-estu.cilsy.my.id
+    dest: /etc/nginx/sites-enabled/jenkins-estu.cilsy.my.id
+    state: link
+  become: true
   notify:
     - restart nginx
+
+- name: Install Certbot
+  apt:
+    name: 
+      - certbot
+      - python3-certbot-nginx
+    update_cache: yes
+    autoremove: yes
+  become: true
+
+- name: Register certbot
+  shell: |
+    certbot -n register --agree-tos --email andro.medh4@gmail.com
+    touch /etc/letsencrypt/.registered
+  args:
+    creates: /etc/letsencrypt/.registered
+  become: true
+
+- name: Setup cronjob for renewal
+  cron:
+    name: certbot-renewal
+    job: "/bin/bash -lc '/usr/bin/certbot -q renew'"
+    minute: "0"
+    hour: "14"
+  become: true
+
+- name: 'Get certificate'
+  command: '/usr/bin/certbot -n --nginx --agree-tos --email andro.medh4@gmail.com -d jenkins-estu.cilsy.my.id'
+  args:
+    creates: '/etc/letsencrypt/live/jenkins-estu.cilsy.my.id'
+  ignore_errors: true
+  become: true

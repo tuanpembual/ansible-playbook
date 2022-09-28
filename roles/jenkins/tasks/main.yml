@@ -1,0 +1,26 @@
+---
+- name: Check Environment
+  debug: msg="reading from {{ env_name }}"
+
+# ## target install jenkins
+- name: Add an Apt signing key jenkins
+  ansible.builtin.apt_key:
+    url: https://pkg.jenkins.io/debian/jenkins.io.key
+    state: present
+  become: true
+
+- name: Add jenkins repository into sources list
+  ansible.builtin.apt_repository:
+    repo: "deb https://pkg.jenkins.io/debian-stable binary/"
+    state: present
+    filename: jenkins
+  become: true
+
+- name: Install java and jenkins
+  apt:
+    name: 
+      - openjdk-11-jdk
+      - jenkins
+    update_cache: yes
+    autoremove: yes
+  become: true
